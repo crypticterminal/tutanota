@@ -1133,6 +1133,16 @@ module.exports = {
 		"yourFolders_action": "YOUR FOLDERS",
 		"yourMessage_label": "Your message",
 		"imprintUrl_label": "Link to imprint",
-		"imprint_label": "Imprint"
+		"imprint_label": "Imprint",
+		"yourMessage_label": "Your message",
+		"goPremium_msg": "As a Premium user you can adjust your search filters in the menu to the left.",
+		"changeTimeFrame_msg": "Go Premium and adjust your search period!",
+		"importUsers_action": "Add multiple users",
+		"enterAsCSV_msg": "Please enter your users details as CSV",
+		"stillReferencedFromContactForm_msg": "This item can not be deactivated because it is still referenced from a contact form.",
+		"onlyAvailableForPremiumNotIncluded_msg": "This feature can only be ordered after upgrading to Premium. Please upgrade your account now.",
+		"sharedMailbox_label": "Shared mailboxes:",
+		"updateAvailable_label": "Update available ({version})",
+		"clickToUpdate_msg": "Click here if you want to apply it now, or let us auto install on quit."
 	}
 }

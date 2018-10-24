@@ -1137,6 +1137,14 @@ module.exports = {
 		"yourFolders_action": "DEINE ORDNER",
 		"yourMessage_label": "Deine Nachricht",
 		"imprintUrl_label": "Link zum Impressum",
-		"imprint_label": "Impressum"
+		"imprint_label": "Impressum",
+		"yourMessage_label": "Deine Nachricht",
+		"goPremium_msg": "Als Premium-Nutzer kannst du links im Menü deine Suchfilter anpassen.",
+		"changeTimeFrame_msg": "Mit Premium kannst du deinen Suchzeitraum erweitern!",
+		"stillReferencedFromContactForm_msg": "Diese Instanz kann nicht deaktiviert werden, da sie noch von einem Kontaktformular referenziert wird.",
+		"onlyAvailableForPremiumNotIncluded_msg": "Diese Funktion kann nur nach dem Wechsel auf Tutanota Premium gebucht werden. Bitte wechsel jetzt zu Premium!",
+		"sharedMailbox_label": "Geteilte Mailboxen:",
+		"updateAvailable_label": "Neue Version verfügbar ({version})",
+		"clickToUpdate_msg": "Hier klicken um sie sofort zu installieren."
 	}
 }
