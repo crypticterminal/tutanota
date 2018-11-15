@@ -17,7 +17,7 @@ import {HttpMethod, isSameId} from "../api/common/EntityFunctions"
 import {createDeleteMailFolderData} from "../api/entities/tutanota/DeleteMailFolderData"
 import {createDeleteMailData} from "../api/entities/tutanota/DeleteMailData"
 import {MailTypeRef} from "../api/entities/tutanota/Mail"
-import {lazyMemoized, neverNull} from "../api/common/utils/Utils"
+import {lazyMemoized, neverNull, noOp} from "../api/common/utils/Utils"
 import {MailListView} from "./MailListView"
 import {MailEditor} from "./MailEditor"
 import {assertMainOrNode, isApp} from "../api/Env"
@@ -53,7 +53,7 @@ import {ActionBar} from "../gui/base/ActionBar";
 import {MultiSelectionBar} from "../gui/base/MultiSelectionBar"
 import type {EntityUpdateData} from "../api/main/EntityEventController"
 import {isUpdateForTypeRef} from "../api/main/EntityEventController"
-import stream from "mithril/stream/stream.js"
+import {fileController} from "../file/FileController"
 
 assertMainOrNode()
 
@@ -128,15 +128,38 @@ export class MailView implements CurrentView {
 		})
 
 		this.viewSlider = new ViewSlider([this.folderColumn, this.listColumn, this.mailColumn], "MailView")
-		this.newAction = new Button('newMail_action', () => this._newMail(), () => Icons.Edit)
+		this.newAction = new Button('newMail_action', () => this._newMail().catch(noOp), () => Icons.Edit)
 			.setType(ButtonType.Floating)
 
 		this.view = (): VirtualElement => {
-			return m("#mail.main-view", [
-				m(this.viewSlider),
-				(this.selectedFolder && logins.isInternalUserLoggedIn()
-					&& !logins.isEnabled(FeatureType.ReplyOnly)) ? m(this.newAction) : null
-			])
+			return m("#mail.main-view",
+				{
+					ondragover: (ev) => {
+						// do not check the datatransfer here because it is not always filled, e.g. in Safari
+						ev.stopPropagation()
+						ev.preventDefault()
+						ev.dataTransfer.dropEffect = 'copy'
+					},
+					ondrop: (ev) => {
+						if (ev.dataTransfer.files && ev.dataTransfer.files.length > 0) {
+							Promise.join(
+								this._newMail(),
+								fileController.readLocalFiles(ev.dataTransfer.files),
+								(ed, dataFiles) => {
+									ed._attachFiles((dataFiles: any))
+									m.redraw()
+								}).catch(noOp)
+							ev.stopPropagation()
+							ev.preventDefault()
+						}
+					}
+				}
+				, [
+					m(this.viewSlider),
+					(this.selectedFolder && logins.isInternalUserLoggedIn() && !logins.isEnabled(FeatureType.ReplyOnly))
+						? m(this.newAction)
+						: null
+				])
 		}
 
 		let closeAction = () => this.mailHeaderDialog.close()
@@ -533,13 +556,15 @@ export class MailView implements CurrentView {
 		]).setColors(ButtonColors.Nav)
 	}
 
-	_newMail() {
+	_newMail(): Promise<MailEditor> {
 		return checkApprovalStatus(false).then(sendAllowed => {
 			if (sendAllowed) {
 				let editor = new MailEditor(mailModel.getMailboxDetailsForMailListId(this.selectedFolder.mails))
 				editor.initWithTemplate(null, null, "", getEmailSignature())
 				editor.show()
+				return editor
 			}
+			return Promise.reject("not allowed to send mail")
 		})
 	}
 
